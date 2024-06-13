@@ -1,0 +1,94 @@
+* {
+    font-family: 'Tahoma';
+    font-weight: bold;
+}
+
+/* Основное окно */
+QMainWindow {
+    background-color: #000022; /* Очень темно-синий фон, практически черный */
+    border-radius: 5px; /* Сглаженные углы 5 пикселей */
+}
+
+/* Кнопки */
+QPushButton {
+    background-color: #003366; /* Темно-голубой цвет */
+    border-radius: 5px; /* Сглаженные углы 5 пикселей */
+    color: #A9A9A9; /* Темно-серый цвет шрифта */
+}
+
+/* Стиль кнопок при наведении */
+QPushButton:hover {
+    background-color: #004080; /* Немного светлее */
+}
+
+/* Стиль кнопок при нажатии */
+QPushButton:pressed {
+    background-color: #00509E; /* Ещё немного светлее */
+    border: 1px solid #A9A9B6; /* Обводка при нажатии */
+}
+
+
+/* Слайдеры */
+QSlider::groove:horizontal {
+    border: 1px solid #555555;
+    height: 8px;
+    background: #004080; /* Шкала темно-синяя */
+    border-radius: 5px; /* Сглаженные углы 5 пикселей */
+}
+
+QSlider::handle:horizontal {
+    background: #003366; /* Ползунок цвета кнопок */
+    border: 1px solid #333333;
+    width: 18px;
+    margin: -2px 0;
+    border-radius: 5px; /* Сглаженные углы 5 пикселей */
+}
+
+QSlider::groove:vertical {
+    border: 1px solid #555555;
+    width: 8px;
+    background: #004080; /* Шкала темно-синяя */
+    border-radius: 5px; /* Сглаженные углы 5 пикселей */
+}
+
+QSlider::handle:vertical {
+    background: #003366; /* Ползунок цвета кнопок */
+    border: 1px solid #333333;
+    height: 18px;
+    margin: 0 -2px;
+    border-radius: 5px; /* Сглаженные углы 5 пикселей */
+}
+
+/* Поля ввода */
+QLineEdit {
+    background-color: #004080; /* Фон темно-синий, как у шкалы слайдера */
+    color: #A9A9A9; /* Темно-серый цвет шрифта */
+    border: 1px solid transparent; /* Без фокуса обводки нет */
+    border-radius: 5px; /* Сглаженные углы 5 пикселей */
+    selection-background-color: #A9A9A9; /* Индикатор ввода цвета шрифта */
+    selection-color: #000022; /* Цвет выделенного текста */
+}
+
+QLineEdit:focus {
+    border: 1px solid #2E4A70; /* В фокусе имеет обводку цвета, немного более светлого чем фон */
+}
+
+QLabel {
+    color: #A9A9A9; /* Цвет текста такой же, как у QLineEdit */
+}
+
+QGroupBox {
+    border: 1px solid #A9A9A9; /* Цвет обводки такой же, как у QLabel */
+    color: #A9A9A9; /* Цвет шрифта такой же, как у QLabel */
+    border-radius: 5px; /* Сглаженные углы 5 пикселей */
+}
+
+QFrame {
+    border-radius: 5px;
+}
+
+QCheckBox {
+    color: #A9A9A9; /* Цвет шрифта такой же, как у QLabel */
+    font-family: 'Tahoma';
+    font-weight: bold;
+}
