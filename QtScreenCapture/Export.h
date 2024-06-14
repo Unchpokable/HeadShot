@@ -12,7 +12,7 @@ typedef struct TransferArray__
     ULONGLONG DataLength;
 } TransferArray, *PTransferArray;
 
-TransferArray MakeQtScreenshot(int x, int y, int width, int height);
+__declspec(dllexport) TransferArray MakeQtScreenshot(int x, int y, int width, int height);
 
 #ifdef __cplusplus
 }

@@ -9,15 +9,15 @@ class CallbackBase
 public:
     CbIdType AddCallback(Callback pointer);
     void RemoveCallback(CbIdType id);
-
-protected:
     void EnableCallbacks();
     void DisableCallbacks();
+
+protected:
     void EmitCallback();
 
 private:
     CbIdType _cbId {};
-    bool _callbacksEnabled {};
+    bool _callbacksEnabled { true };
     std::unordered_map<CbIdType, Callback> _callbacks;
 };
 

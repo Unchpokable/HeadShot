@@ -110,7 +110,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>QtScreenCapture.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,11 +141,6 @@
     <ClInclude Include="Configs.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="ScreenScanner.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\QtScreenCapture\QtScreenCapture.vcxproj">
-      <Project>{5c2ab7fc-e2c9-4f5a-ae21-3cfefec6d6ad}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

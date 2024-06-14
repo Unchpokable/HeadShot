@@ -1,41 +1,11 @@
 #include "ScreenScanner.h"
 
-#define QT_SCREENSHOTS
+#define NATIVE_SCREENSHOTS
 
-#ifdef QT_SCREENSHOTS
-#include "../QtScreenCapture/Export.h"
-#endif
-
+#ifdef NATIVE_SCREENSHOTS
 #include <gdiplus.h>
-
 #pragma comment(lib, "Gdiplus.lib")
-
-int GetEncoderClsid(const WCHAR* format, CLSID* pClsid) {
-    using namespace Gdiplus;
-    UINT  num = 0;
-    UINT  size = 0;
-
-    ImageCodecInfo* pImageCodecInfo = NULL;
-
-    GetImageEncodersSize(&num, &size);
-    if(size == 0)
-        return -1;
-
-    pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
-    if(pImageCodecInfo == NULL)
-        return -1;
-
-    GetImageEncoders(num, size, pImageCodecInfo);
-    for(UINT j = 0; j < num; ++j) {
-        if(wcscmp(pImageCodecInfo[j].MimeType, format) == 0) {
-            *pClsid = pImageCodecInfo[j].Clsid;
-            free(pImageCodecInfo);
-            return j;
-        }
-    }
-    free(pImageCodecInfo);
-    return 0;
-}
+#endif
 
 ScreenScanner::~ScreenScanner() 
 {
@@ -58,8 +28,8 @@ void ScreenScanner::Start()
         {
             if (_needScan)
             {
-                const auto pixels = CaptureScreen();
-                if(CheckFramePixels(pixels))
+                CaptureScreen();
+                if(CheckFramePixels())
                     EmitCallback();
             }
 
@@ -77,53 +47,46 @@ void ScreenScanner::SetNeedScanning(bool flag)
     _needScan = flag;
 }
 
-Array<Pixel>* ScreenScanner::CaptureScreen() const noexcept
+void ScreenScanner::CaptureScreen() const noexcept
 {
     const auto vpParams = _config.ViewportParameters;
-#ifdef NATIVE_SCREENSHOTS
+    HDC hScreenDC = GetDC(NULL);
+    HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 
-    using namespace Gdiplus;
-    IStream* istream;
-    HRESULT res = CreateStreamOnHGlobal(NULL, true, &istream);
-    GdiplusStartupInput gdiplusStartupInput;
-    ULONG_PTR gdiplusToken;
-    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-    {
-        auto out = new Array<Pixel>(vpParams.Height * vpParams.Width);
-        HDC scrdc, memdc;
-        HBITMAP membit;
-        scrdc = ::GetDC(0);
-        int Height = GetSystemMetrics(SM_CYSCREEN);
-        int Width = GetSystemMetrics(SM_CXSCREEN);
-        memdc = CreateCompatibleDC(scrdc);
-        membit = CreateCompatibleBitmap(scrdc, Width, Height);
-        HBITMAP hOldBitmap = (HBITMAP)SelectObject(memdc, membit);
-        BitBlt(memdc, vpParams.X, vpParams.Y, vpParams.Width, vpParams.Height, scrdc, 0, 0, SRCCOPY);
+    HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, vpParams.Width, vpParams.Height);
+    HGDIOBJ oldBitmap = SelectObject(hMemoryDC, hBitmap);
 
-        Bitmap bitmap(membit, NULL);
-        BitmapData bitmapData;
+    BitBlt(hMemoryDC, 0, 0, vpParams.Width, vpParams.Height, hScreenDC, vpParams.X, vpParams.Y, SRCCOPY);
 
-        DeleteObject(memdc);
-        DeleteObject(membit);
-        ::ReleaseDC(0, scrdc);
-    }
-    GdiplusShutdown(gdiplusToken);
-#endif
-    const auto transferArray = MakeQtScreenshot(vpParams.X, vpParams.Y, vpParams.Width, vpParams.Height);
-    const auto ret = new Array<Pixel>();
-    ret->SetData(reinterpret_cast<Pixel*>(transferArray.Data), transferArray.DataLength);
-    return ret;
-#ifdef QT_SCREENSHOTS
-#endif
+    BITMAP bitmap;
+    GetObject(hBitmap, sizeof(BITMAP), &bitmap);
+
+    memset(_data, 0, sizeof(BYTE) * vpParams.Width * vpParams.Height);
+
+    BITMAPINFOHEADER bi = { 0 };
+    bi.biSize = sizeof(BITMAPINFOHEADER);
+    bi.biWidth = vpParams.Width;
+    bi.biHeight = -vpParams.Height; 
+    bi.biPlanes = 1;
+    bi.biBitCount = 24;
+    bi.biCompression = BI_RGB;
+
+    GetDIBits(hMemoryDC, hBitmap, 0, vpParams.Height, _data, (BITMAPINFO*)&bi, DIB_RGB_COLORS);
+
+    SelectObject(hMemoryDC, oldBitmap);
+    DeleteObject(hBitmap);
+    DeleteDC(hMemoryDC);
+    ReleaseDC(NULL, hScreenDC);
 }
 
-bool ScreenScanner::CheckFramePixels(const Array<Pixel>* pixels) const noexcept
+bool ScreenScanner::CheckFramePixels() const noexcept
 {
+    const auto& [x,y,wid, len] = _config.ViewportParameters;
     const auto& [Lower, Higher] = _config.DetectibleColor;
 
-    for (std::size_t i { 0 }; i < pixels->Length(); i++)
+    for(std::size_t i { 0 }; i < static_cast<unsigned long long>(wid) * len; i++)
     {
-        const auto& [Blue, Green, Red] = pixels->Data()[i];
+        const auto& [Blue, Green, Red] = _data[i];
         if(Red >= Lower.Red && Red <= Higher.Red &&
             Green >= Lower.Green && Green <= Higher.Green &&
             Blue >= Lower.Blue && Blue <= Higher.Blue) 

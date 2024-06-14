@@ -96,6 +96,17 @@ public:
         return _length;
     }
 
+    void Resize(std::size_t newSize) noexcept
+    {
+        auto temp = new T[newSize];
+
+        if(_data)
+            memcpy(temp, _data, newSize < _length ? newSize : _length);
+
+        _data = temp;
+        _length = newSize;
+    }
+
 private:
     T* _data;
     std::size_t _length;

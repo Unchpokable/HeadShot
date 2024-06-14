@@ -13,7 +13,11 @@ class ScreenScanner final : public CallbackBase<VoidCallback>
 {
 public:
     explicit ScreenScanner(const Configuration& config)
-    : _config(config) {}
+    : _config(config)
+    {
+        const auto vpParams = config.ViewportParameters;
+        _data = new Pixel[vpParams.Width * vpParams.Height];
+    }
 
     ~ScreenScanner();
 
@@ -29,7 +33,9 @@ private:
     bool _needScan { true };
     std::thread* _worker { nullptr };
 
-    Array<Pixel>* CaptureScreen() const noexcept;
-    bool CheckFramePixels(const Array<Pixel>* pixels) const noexcept;
+    mutable Pixel* _data;
+
+    void CaptureScreen() const noexcept;
+    bool CheckFramePixels(void) const noexcept;
 };
 
