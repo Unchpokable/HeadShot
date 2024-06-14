@@ -4,9 +4,7 @@
 
 TransferArray MakeQtScreenshot(int x, int y, int width, int height)
 {
-    const auto screensCap = new QtScreenCapture();
-
-    auto pixels = screensCap->MakeScreenshot(x, y, width, height);
+    const auto pixels = QtScreenCapture::MakeScreenshot(x, y, width, height);
 
     TransferArray out;
     out.DataLength = pixels.size();
