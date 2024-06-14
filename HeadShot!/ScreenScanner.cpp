@@ -1,5 +1,11 @@
 #include "ScreenScanner.h"
 
+#define QT_SCREENSHOTS
+
+#ifdef QT_SCREENSHOTS
+#include "../QtScreenCapture/Export.h"
+#endif
+
 #include <gdiplus.h>
 
 #pragma comment(lib, "Gdiplus.lib")
@@ -73,35 +79,42 @@ void ScreenScanner::SetNeedScanning(bool flag)
 
 Array<Pixel>* ScreenScanner::CaptureScreen() const noexcept
 {
-    const auto params = _config.ViewportParameters;
-    HDC hScreenDC = GetDC(NULL);
-    HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
+    const auto vpParams = _config.ViewportParameters;
+#ifdef NATIVE_SCREENSHOTS
 
-    HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, params.Width, params.Height);
+    using namespace Gdiplus;
+    IStream* istream;
+    HRESULT res = CreateStreamOnHGlobal(NULL, true, &istream);
+    GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    {
+        auto out = new Array<Pixel>(vpParams.Height * vpParams.Width);
+        HDC scrdc, memdc;
+        HBITMAP membit;
+        scrdc = ::GetDC(0);
+        int Height = GetSystemMetrics(SM_CYSCREEN);
+        int Width = GetSystemMetrics(SM_CXSCREEN);
+        memdc = CreateCompatibleDC(scrdc);
+        membit = CreateCompatibleBitmap(scrdc, Width, Height);
+        HBITMAP hOldBitmap = (HBITMAP)SelectObject(memdc, membit);
+        BitBlt(memdc, vpParams.X, vpParams.Y, vpParams.Width, vpParams.Height, scrdc, 0, 0, SRCCOPY);
 
-    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemoryDC, hBitmap);
+        Bitmap bitmap(membit, NULL);
+        BitmapData bitmapData;
 
-    BitBlt(hMemoryDC, 0, 0, params.Width, params.Height, hScreenDC, params.X, params.Y, SRCCOPY);
-
-    BITMAPINFOHEADER bi = { 0 };
-    bi.biSize = sizeof(BITMAPINFOHEADER);
-    bi.biWidth = params.Width;
-    bi.biHeight = -params.Height;
-    bi.biPlanes = 1;
-    bi.biBitCount = 24;
-    bi.biCompression = BI_RGB;
-
-    const auto pixels = new Array<Pixel>(params.Width * params.Height);
-
-    GetDIBits(hMemoryDC, hBitmap, 0, params.Height, pixels->Data(), (BITMAPINFO*)&bi, DIB_RGB_COLORS);
-
-    SelectObject(hMemoryDC, hOldBitmap);
-
-    DeleteObject(hBitmap);
-    DeleteDC(hMemoryDC);
-    ReleaseDC(NULL, hScreenDC);
-
-    return pixels;
+        DeleteObject(memdc);
+        DeleteObject(membit);
+        ::ReleaseDC(0, scrdc);
+    }
+    GdiplusShutdown(gdiplusToken);
+#endif
+    const auto transferArray = MakeQtScreenshot(vpParams.X, vpParams.Y, vpParams.Width, vpParams.Height);
+    const auto ret = new Array<Pixel>();
+    ret->SetData(reinterpret_cast<Pixel*>(transferArray.Data), transferArray.DataLength);
+    return ret;
+#ifdef QT_SCREENSHOTS
+#endif
 }
 
 bool ScreenScanner::CheckFramePixels(const Array<Pixel>* pixels) const noexcept

@@ -75,6 +75,17 @@ public:
         return _data;
     }
 
+    /**
+     * \brief Hardly set a new data chunk with given length. May be unsafe
+     * \param data pointer to new data
+     * \param length length of new array
+     */
+    void SetData(T* data, std::size_t length)
+    {
+        _data = data;
+        _length = length;
+    }
+
     std::size_t Length() const noexcept
     {
         return _length;
