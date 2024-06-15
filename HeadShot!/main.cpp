@@ -37,12 +37,13 @@ int main(int argc, char** argv)
 
     ScreenScanner scanner(config);
 
-    //scanner.AddCallback(MouseLeft);
-
+#ifndef _DEBUG
+    scanner.AddCallback(MouseLeft);
+#else
     scanner.AddCallback([]() {
         std::cout << "Pixels detected";
     });
-
+#endif
     scanner.Start();
 
     while(true)
