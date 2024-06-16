@@ -10,3 +10,4 @@ typedef struct MousePos__
 MousePos GetMousePosition(void);
 
 void MouseLeft(void);
+

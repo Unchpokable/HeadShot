@@ -4,7 +4,11 @@
 #include <iostream>
 
 #include "Configs.h"
-#include "Input.h"
+
+extern "C" {
+    #include "Input.h"
+}
+
 #include "ScreenScanner.h"
 
 std::string JoinArgs(int argc, char* argv[])

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Loader.h"
 #include <QtWidgets/QApplication>
 #include <QFile>
