@@ -13,8 +13,8 @@ Tuple<QColor, QColor> ColorUtils::GenerateColorRange(QColor baseColor, byte offs
     int green = baseColor.green();
     int blue = baseColor.blue();
 
-    QColor color1(adjustColor(red, offset), adjustColor(green, offset), adjustColor(blue, offset));
-    QColor color2(adjustColor(red, -offset), adjustColor(green, -offset), adjustColor(blue, -offset));
+    QColor color1(adjustColor(red, -offset), adjustColor(green, -offset), adjustColor(blue, -offset));
+    QColor color2(adjustColor(red, offset), adjustColor(green, offset), adjustColor(blue, offset));
 
     return { color1, color2 };
 }

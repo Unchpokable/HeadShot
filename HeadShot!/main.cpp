@@ -39,11 +39,10 @@ int main(int argc, char** argv)
 
 #ifndef _DEBUG
     scanner.AddCallback(MouseLeft);
-#else
-    scanner.AddCallback([]() {
-        std::cout << "Pixels detected";
-    });
 #endif
+    scanner.AddCallback([]() {
+        std::cout << "[Info] Pixels detected" << "\n";
+    });
     scanner.Start();
 
     while(true)

@@ -281,7 +281,7 @@
       </rect>
      </property>
      <property name="maximum">
-      <number>30</number>
+      <number>255</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

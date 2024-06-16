@@ -1,7 +1,10 @@
 #include "Loader.h"
 
+#include <QDir>
+#include <QFileInfo>
 #include <QScreen>
 #include <QProcess>
+#include <QMessageBox>
 
 #include "ColorUtils.h"
 
@@ -46,6 +49,7 @@ Loader::Loader(QWidget *parent)
 
 Loader::~Loader()
 {
+    _triggerBotProcess->terminate();
     delete ui;
 }
 
@@ -58,6 +62,11 @@ void Loader::StartTriggerProcess()
     }
 
     _triggerBotProcess = new QProcess();
+
+    QString program = QDir::toNativeSeparators(QCoreApplication::applicationDirPath() + "/" + _triggerBotExeName);
+    QString programDir = QFileInfo(program).absolutePath();
+
+    _triggerBotProcess->setWorkingDirectory(programDir);
 
     QStringList args;
 
@@ -76,14 +85,21 @@ void Loader::StartTriggerProcess()
         rColor = _selectionColor;
     }
 
+    args << "cmd" << "/c" << "start" << _triggerBotExeName;
+
     // -console 1 -colorl #00ff00 -colorr #ff00ff -wpx 1270 -wpy 710 -wpw 10 -wph 10
-    args << "-console" << "1" << "colorl" << lColor.name() << "colorr" << rColor.name()
+    args << "-console" << "1" << "-colorl" << lColor.name() << "-colorr" << rColor.name()
         << "-wpx" << QString::number(_windowGeometry.width() / 2 - ui->widthSlider->value() / 2)
         << "-wpy" << QString::number(_windowGeometry.height() / 2 - ui->heightSlider->value() / 2)
         << "-wpw" << QString::number(ui->widthSlider->value())
         << "-wph" << QString::number(ui->heightSlider->value());
 
-    _triggerBotProcess->start(_triggerBotExeName, args);
+    _triggerBotProcess->start("cmd", args);
+
+    if (!_triggerBotProcess->waitForStarted())
+    {
+        QMessageBox::critical(nullptr, "Error", "Unable to start trigger bot");
+    }
 }
 
 void Loader::TargetColorSettingsHexInputChanged()
@@ -114,10 +130,9 @@ void Loader::TargetColorSettingsHexInputChanged()
 }
 
 void Loader::TargetColorSettingsChanged() {
-
-    auto r = (byte)ui->targetRedSlider->value();
-    auto g = (byte)ui->targetGreenSlider->value();
-    auto b = (byte)ui->targetBlueSlider->value();
+    const auto r = static_cast<byte>(ui->targetRedSlider->value());
+    const auto g = static_cast<byte>(ui->targetGreenSlider->value());
+    const auto b = static_cast<byte>(ui->targetBlueSlider->value());
 
     _selectionColor.setRed(r);
     _selectionColor.setGreen(g);
