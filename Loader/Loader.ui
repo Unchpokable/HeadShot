@@ -30,7 +30,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>Window size</string>
+     <string>View box size</string>
     </property>
     <widget class="QSlider" name="widthSlider">
      <property name="geometry">
@@ -77,7 +77,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Ширина</string>
+      <string>Width</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_2">
@@ -90,7 +90,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Высота</string>
+      <string>Height</string>
      </property>
     </widget>
     <widget class="QLabel" name="widLabel">
@@ -267,6 +267,12 @@
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Detect range of colors as trigger instead of hard setted color. Recommended to use with 5-15 value. Do not set maximum value to avoid detecting any pixel at your screen as target.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="toolTipDuration">
+      <number>30</number>
+     </property>
      <property name="text">
       <string>Extend</string>
      </property>
@@ -279,6 +285,9 @@
        <width>181</width>
        <height>22</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RGB offset for pixel detection. Will affect all of R-G-B channels. &lt;br/&gt;Target will be detected if some colors in view box will be equals to selected Target Color +- Extend value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="maximum">
       <number>255</number>
@@ -323,6 +332,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Size of your screen</string>
+    </property>
     <property name="text">
      <string>0x0</string>
     </property>
@@ -335,6 +347,9 @@
       <width>221</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Launch Trigger bot process. Trigger will be launched at separate process with its own console, to change triggerbot parameters you will need to close previous instance of triggerbot and launch new one with new parameters&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="text">
      <string>Launch</string>
